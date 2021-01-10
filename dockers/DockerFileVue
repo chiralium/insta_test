@@ -1,0 +1,11 @@
+FROM ubuntu:latest
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt update -y && \
+    apt upgrade -y && \
+    apt install npm -y && \
+    npm install -g vue
+
+RUN mkdir /home/insta
+RUN mkdir /home/insta/frontend

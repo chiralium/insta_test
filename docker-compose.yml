@@ -29,3 +29,17 @@ services:
       - '/home/evgeniy/computer/lab/insta/api:/var/www/html'
       - '/home/evgeniy/computer/lab/insta/000-default.conf:/etc/apache2/sites-available/000-default.conf'
       - '/home/evgeniy/computer/lab/insta/apache2.conf:/etc/apache2/apache2.conf'
+  frontend:
+    build:
+      context: ./dockers
+      dockerfile: DockerFileVue
+    networks:
+      - insta_network
+    ports:
+      - "8080:8080"
+    command: >
+      bash -c "cd /home/insta/frontend && npm install && npm run dev"
+    volumes:
+      - '/home/evgeniy/computer/lab/insta/frontend/insta:/home/insta/frontend'
+    env_file:
+      - '/home/evgeniy/computer/lab/insta/settings.ini'
