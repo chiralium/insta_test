@@ -23,6 +23,15 @@
         public function set()
         {
             $db = new DB();
+            $is_exist = $db->select(
+                self::$table,
+                array(
+                    'name' => $this->name
+                )
+            );
+
+            if ($is_exist) return false;
+
             return $db->insert(
                 self::$table,
                 array(

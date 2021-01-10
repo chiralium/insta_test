@@ -165,7 +165,24 @@
                                 $data->username,
                                 $data->password
                             );
-                            $user->set();
+                            $result = $user->set();
+
+                            if ( !$result ) {
+                                $response = new Response(
+                                    json_encode(
+                                        array(
+                                            'error' => 'User is already exists!'
+                                        )
+                                    ),
+                                    200,
+                                    array(
+                                        'Content-Type' => 'application/json'
+                                    )
+                                );
+                                $response->response();
+                                break;
+                            }
+
                             $response = new Response(
                                 json_encode(
                                     array(

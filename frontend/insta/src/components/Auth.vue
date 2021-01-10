@@ -6,6 +6,8 @@
       <input type="submit" value="Войти" v-bind:disabled="!(sign_password && sign_login)" v-on:click="login" />
     </div>
 
+    <div v-if="error">{{ error }}</div>
+
     <div class="auth_login">
       <input type="text" placeholder="login" v-model="register_login" />
       <input type="password" placeholder="password" v-model="register_password" />
@@ -23,7 +25,9 @@ export default {
       sign_password : null,
 
       register_login : null,
-      register_password : null
+      register_password : null,
+
+      error : null
     }
   },
 
@@ -79,9 +83,18 @@ export default {
       ).then( response => response.json() )
         .then(
           ( data ) => {
-            console.log(data);
+            if ( data.error ) throw data.error;
+
+            this.sign_login = this.register_login;
+            this.sign_password = this.register_password;
+            this.login();
           }
         )
+      .catch(
+        ( e ) => {
+          this.error = e;
+        }
+      )
     }
   }
 }
