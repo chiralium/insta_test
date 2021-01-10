@@ -11,6 +11,7 @@ class Response
 
     public function response()
     {
+        header("HTTP/1.1 $this->status");
         if ( $this->headers )
             foreach ($this->headers as $header => $value) header(sprintf("%s:%s", $header, $value));
         echo $this->body;

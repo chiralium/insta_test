@@ -6,6 +6,7 @@
 
     class User {
         static $table = 'insta_users';
+        static $key = 'big#psKT';
 
         public function __construct($name = null, $pwd = '')
         {
@@ -38,17 +39,15 @@
             if ( empty($user) ) return null;
             else {
                 $token_payload = [
-                    'iss' => 'localhost',
-                    'sub' => 'secret',
                     'name' => $user->name,
                 ];
 
-                $key = 'big#psKT';
+
                 $jwt = JWT::encode(
                     $token_payload,
-                    base64_encode(
+                    base64_decode(
                         strtr(
-                            $key,
+                            self::$key,
                             '-_',
                             '+/'
                         )
@@ -57,5 +56,26 @@
                 );
                 return $jwt;
             }
+        }
+
+        public static function is_authorized($jwt)
+        {
+            try {
+                $user = JWT::decode(
+                    $jwt,
+                    base64_decode(
+                        strtr(
+                            self::$key,
+                            '-_',
+                            '+/'
+                        )
+                    ),
+                    ['HS256']
+                );
+            } catch (Exception $e) {
+                return null;
+            }
+
+            return $user;
         }
     }
