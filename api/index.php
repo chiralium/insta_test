@@ -263,6 +263,12 @@
                         $response->response();
                 }
                 break;
+            default:
+                $response = new Response(
+                    '',
+                    404
+                );
+                $response->response();
         }
     }
 
