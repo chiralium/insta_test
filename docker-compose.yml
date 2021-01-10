@@ -11,10 +11,14 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: insta
     networks:
       - insta_network
     ports:
       - "3306:3306"
+    volumes:
+      - "./sql/dump.sql:/docker-entrypoint-initdb.d/dump.sql"
+
 
   backend:
     build:
@@ -26,9 +30,9 @@ services:
       - "80:80"
     command: apachectl -D FOREGROUND
     volumes:
-      - '/home/evgeniy/computer/lab/insta/api:/var/www/html'
-      - '/home/evgeniy/computer/lab/insta/000-default.conf:/etc/apache2/sites-available/000-default.conf'
-      - '/home/evgeniy/computer/lab/insta/apache2.conf:/etc/apache2/apache2.conf'
+      - './api:/var/www/html'
+      - './000-default.conf:/etc/apache2/sites-available/000-default.conf'
+      - './apache2.conf:/etc/apache2/apache2.conf'
 
   frontend:
     build:
@@ -41,6 +45,6 @@ services:
     command: >
       bash -c "cd /home/insta/frontend && npm install && npm run dev"
     volumes:
-      - '/home/evgeniy/computer/lab/insta/frontend/insta:/home/insta/frontend'
+      - './frontend/insta:/home/insta/frontend'
     env_file:
-      - '/home/evgeniy/computer/lab/insta/settings.ini'
+      - './settings.ini'
