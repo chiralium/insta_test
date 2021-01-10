@@ -5,8 +5,16 @@
       <div v-if="contacts.length > 1" class="home_contacts">
         <ul>
           <li v-for="contact in contacts" :key="contact.id">
-            <span style="font-size: 32pt; color: green; cursor: pointer" v-on:click="add(contact)">
-              <b>+</b>
+
+            <span
+              v-if="(mycontacts.filter( mycontact => { return mycontact.id === contact.id } )).length === 0"
+              style="font-size: 24pt; color: green; cursor: pointer" v-on:click="add(contact)">
+              <b>➕</b>
+            </span>
+            <span v-else
+                  style="font-size: 24pt; color: green"
+            >
+              <b>✅</b>
             </span>
             {{ contact.name }}
             -
@@ -177,6 +185,10 @@ export default {
     border: 2px solid red;
     border-radius: 10px;
     padding: 25px;
+  }
+
+  li {
+    margin-bottom: 10px;
   }
 
   ul {
