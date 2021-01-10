@@ -199,8 +199,71 @@
                             404
                         );
                         $response->response();
+                }
+                break;
+            case '/api/contacts':
+                switch ($method) {
+                    case 'GET':
+                        $headers = apache_request_headers();
+                        if ( !array_key_exists('Authorization', $headers ) ) {
+                            $response = new Response(
+                                json_encode(
+                                    array(
+                                        'error' => 'Authorization headers is not provided!'
+                                    )
+                                ),
+                                200,
+                                array(
+                                    'Content-Type' => 'application/json'
+                                )
+                            );
+                            $response->response();
+                            break;
+                        }
+
+                        $jwt = $headers['Authorization'];
+                        $user = User::is_authorized($jwt);
+
+                        if ( !$user ) {
+                            $response = new Response(
+                                json_encode(
+                                    array(
+                                        'error' => 'Authorization failed!'
+                                    )
+                                ),
+                                200,
+                                array(
+                                    'Content-Type' => 'application/json'
+                                )
+                            );
+                            $response->response();
+                            break;
+                        }
+
+                        $db = new DB();
+                        $contacts = $db->select(
+                            'insta_contacts'
+                        );
+                        $response = new Response(
+                            json_encode(
+                                $contacts
+                            ),
+                            200,
+                            array(
+                                'Content-Type' => 'application/json'
+                            )
+                        );
+                        $response->response();
+                        break;
+                    default:
+                        $response = new Response(
+                            '',
+                            404
+                        );
+                        $response->response();
 
                 }
+                break;
         }
     }
 
