@@ -1,0 +1,31 @@
+version: '3.1'
+
+networks:
+  insta_network:
+    driver: bridge
+
+services:
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - insta_network
+    ports:
+      - "3306:3306"
+
+  api:
+    build:
+      context: ./dockers
+      dockerfile: DockerFilePHP
+    networks:
+      - insta_network
+    ports:
+      - "80:80"
+    command: apachectl -D FOREGROUND
+    volumes:
+      - '/home/evgeniy/computer/lab/insta/api:/var/www/html'
+      - '/home/evgeniy/computer/lab/insta/000-default.conf:/etc/apache2/sites-available/000-default.conf'
+      - '/home/evgeniy/computer/lab/insta/apache2.conf:/etc/apache2/apache2.conf'
