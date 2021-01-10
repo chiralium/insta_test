@@ -154,6 +154,51 @@
                             404
                         );
                         $response->response();
+                }
+                break;
+            case '/api/register':
+                switch ($method) {
+                    case 'POST':
+                        $data = json_decode(file_get_contents('php://input'));
+                        if ( $data->username && $data->password ) {
+                            $user = new User(
+                                $data->username,
+                                $data->password
+                            );
+                            $user->set();
+                            $response = new Response(
+                                json_encode(
+                                    array(
+                                        'ok' => 'User is created!'
+                                    )
+                                ),
+                                200,
+                                array(
+                                    'Content-Type' => 'application/json'
+                                )
+                            );
+                            $response->response();
+                        } else {
+                            $response = new Response(
+                                json_encode(
+                                    array(
+                                        'error' => 'Credentials is not provided'
+                                    )
+                                ),
+                                200,
+                                array(
+                                    'Content-Type' => 'application/json'
+                                )
+                            );
+                            $response->response();
+                        }
+                        break;
+                    default:
+                        $response = new Response(
+                            '',
+                            404
+                        );
+                        $response->response();
 
                 }
         }

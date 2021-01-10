@@ -46,4 +46,16 @@
 
             return $std_result;
         }
+
+        public function insert( $table, $fieldset = null )
+        {
+            if ( !$fieldset ) return null;
+
+            $values = "('" . implode("','" , array_values($fieldset)) . "')";
+            $fields = "(" . implode(",", array_keys($fieldset)) . ")";
+
+            $sql_insert_statement = "INSERT INTO $table $fields VALUES$values";
+            $result = mysqli_query($this->conn, $sql_insert_statement);
+            return $result;
+        }
     }

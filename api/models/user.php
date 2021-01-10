@@ -12,7 +12,24 @@
         {
             $this->name = $name;
             $this->pwd = $pwd;
+            $this->db = self::get(
+                array(
+                    'name' => $this->name,
+                    'pwd' => $this->pwd
+                )
+            );
+        }
 
+        public function set()
+        {
+            $db = new DB();
+            return $db->insert(
+                self::$table,
+                array(
+                    'name' => $this->name,
+                    'pwd' => $this->pwd
+                )
+            );
         }
 
         public static function get($where = array())
@@ -39,7 +56,7 @@
             if ( empty($user) ) return null;
             else {
                 $token_payload = [
-                    'name' => $user->name,
+                    'name' => $user->name
                 ];
 
 
