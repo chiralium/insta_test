@@ -16,7 +16,7 @@ services:
     ports:
       - "3306:3306"
 
-  api:
+  backend:
     build:
       context: ./dockers
       dockerfile: DockerFilePHP

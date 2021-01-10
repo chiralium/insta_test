@@ -100,7 +100,7 @@
                     break;
             case '/api/home':
                 switch ($method) {
-                    case 'GET':
+                    case 'GET':case 'OPTIONS':
                         $headers = apache_request_headers();
                         if ( !array_key_exists('Authorization', $headers ) ) {
                             $response = new Response(
@@ -158,7 +158,7 @@
                 break;
             case '/api/register':
                 switch ($method) {
-                    case 'POST':
+                    case 'POST':case 'OPTIONS':
                         $data = json_decode(file_get_contents('php://input'));
                         if ( $data->username && $data->password ) {
                             $user = new User(
@@ -203,7 +203,7 @@
                 break;
             case '/api/contacts':
                 switch ($method) {
-                    case 'GET':
+                    case 'GET':case 'OPTIONS':
                         $headers = apache_request_headers();
                         if ( !array_key_exists('Authorization', $headers ) ) {
                             $response = new Response(

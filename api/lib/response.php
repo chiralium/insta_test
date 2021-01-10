@@ -2,7 +2,7 @@
 
 class Response
 {
-    public function __construct( $body = null, $status = 200, $headers = null )
+    public function __construct( $body = null, $status = "200 OK", $headers = null )
     {
         $this->headers = $headers;
         $this->body = $body;
@@ -11,15 +11,12 @@ class Response
 
     public function response()
     {
-        header("HTTP/1.1 $this->status");
         if ( $this->headers )
             foreach ($this->headers as $header => $value) header(sprintf("%s:%s", $header, $value));
-        echo $this->body;
-    }
 
-    public function cors($domains = array()) {
-        if ( empty($domains) ) $val = '*';
-        else $val = implode(',', $domains);
-        header("Access-Control-Allow-Headers: $val");
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+        header("Access-Control-Allow-Headers: Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization");
+        echo $this->body;
     }
 }
