@@ -261,7 +261,6 @@
                             404
                         );
                         $response->response();
-
                 }
                 break;
         }
