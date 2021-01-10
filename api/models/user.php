@@ -8,7 +8,7 @@
         static $table = 'insta_users';
         static $key = 'big#psKT';
 
-        public function __construct($name = null, $pwd = '')
+        public function __construct($name = null, $pwd = '', $id = null)
         {
             $this->name = $name;
             $this->pwd = $pwd;
@@ -18,6 +18,43 @@
                     'pwd' => $this->pwd
                 )
             );
+        }
+
+        public function add_contacts($contact_id)
+        {
+            $db = new DB();
+            $is_exist = $db->select(
+                'insta_user_contacts',
+                array(
+                    'contact_id' => $contact_id,
+                    'user_id' => $this->db->id
+                )
+            );
+
+            if ( $is_exist ) return false;
+
+            $result = $db->insert(
+                'insta_user_contacts',
+                array(
+                    'contact_id' => $contact_id,
+                    'user_id' => $this->db->id
+                )
+            );
+
+            return $result;
+        }
+
+        public static function get_contacts($user_id)
+        {
+            $db = new DB();
+            $contacts = $db->raw(
+                    "
+                        SELECT c.* FROM insta_user_contacts uc 
+                        INNER JOIN insta_contacts c ON uc.contact_id = c.id
+                        WHERE user_id = $user_id 
+                    "
+            );
+            return $contacts;
         }
 
         public function set()
@@ -65,7 +102,9 @@
             if ( empty($user) ) return null;
             else {
                 $token_payload = [
-                    'name' => $user->name
+                    'name' => $user->name,
+                    'id' => $user->id,
+                    'pwd' => $user->pwd
                 ];
 
 

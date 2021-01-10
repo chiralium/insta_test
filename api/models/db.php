@@ -17,6 +17,14 @@
             var_dump($this->conn);
         }
 
+        public function raw( $sql )
+        {
+            $std_result = [];
+            $result = mysqli_query($this->conn, $sql);
+            while ($std = $result->fetch_object()) $std_result[] = $std;
+            return $std_result;
+        }
+
         public function select( $table, $where = array() ) {
             /*
              * $where = array(

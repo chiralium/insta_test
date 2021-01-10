@@ -3,6 +3,46 @@
     ini_set('display_errors', 'On');
     require_once("./config.php");
 
+    function is_loggedin()
+    {
+        $headers = apache_request_headers();
+        if ( !array_key_exists('Authorization', $headers ) ) {
+            $response = new Response(
+                json_encode(
+                    array(
+                        'error' => 'Authorization headers is not provided!'
+                    )
+                ),
+                200,
+                array(
+                    'Content-Type' => 'application/json'
+                )
+            );
+            $response->response();
+            return false;
+        }
+
+        $jwt = $headers['Authorization'];
+        $user = User::is_authorized($jwt);
+
+        if ( !$user ) {
+            $response = new Response(
+                json_encode(
+                    array(
+                        'error' => 'Authorization failed!'
+                    )
+                ),
+                200,
+                array(
+                    'Content-Type' => 'application/json'
+                )
+            );
+            $response->response();
+            return false;
+        }
+        return $user;
+    }
+
     function routing( $path, $method )
     {
         switch ($path) {
@@ -101,41 +141,8 @@
             case '/api/home':
                 switch ($method) {
                     case 'GET':case 'OPTIONS':
-                        $headers = apache_request_headers();
-                        if ( !array_key_exists('Authorization', $headers ) ) {
-                            $response = new Response(
-                                json_encode(
-                                    array(
-                                        'error' => 'Authorization headers is not provided!'
-                                    )
-                                ),
-                                200,
-                                array(
-                                    'Content-Type' => 'application/json'
-                                )
-                            );
-                            $response->response();
-                            break;
-                        }
-
-                        $jwt = $headers['Authorization'];
-                        $user = User::is_authorized($jwt);
-
-                        if ( !$user ) {
-                            $response = new Response(
-                                json_encode(
-                                    array(
-                                        'error' => 'Authorization failed!'
-                                    )
-                                ),
-                                200,
-                                array(
-                                    'Content-Type' => 'application/json'
-                                )
-                            );
-                            $response->response();
-                            break;
-                        }
+                        $user = is_loggedin();
+                        if (!$user) break;
 
                         $response = new Response(
                             json_encode(
@@ -221,42 +228,7 @@
             case '/api/contacts':
                 switch ($method) {
                     case 'GET':case 'OPTIONS':
-                        $headers = apache_request_headers();
-                        if ( !array_key_exists('Authorization', $headers ) ) {
-                            $response = new Response(
-                                json_encode(
-                                    array(
-                                        'error' => 'Authorization headers is not provided!'
-                                    )
-                                ),
-                                200,
-                                array(
-                                    'Content-Type' => 'application/json'
-                                )
-                            );
-                            $response->response();
-                            break;
-                        }
-
-                        $jwt = $headers['Authorization'];
-                        $user = User::is_authorized($jwt);
-
-                        if ( !$user ) {
-                            $response = new Response(
-                                json_encode(
-                                    array(
-                                        'error' => 'Authorization failed!'
-                                    )
-                                ),
-                                200,
-                                array(
-                                    'Content-Type' => 'application/json'
-                                )
-                            );
-                            $response->response();
-                            break;
-                        }
-
+                        if (!is_loggedin()) break;
                         $db = new DB();
                         $contacts = $db->select(
                             'insta_contacts'
@@ -278,6 +250,73 @@
                             404
                         );
                         $response->response();
+                }
+                break;
+            case '/api/get_user_contacts':
+                switch ($method) {
+                    case 'GET':case 'OPTIONS':
+                        $user = is_loggedin();
+                        if (!$user) break;
+                        else {
+                            $contacts = User::get_contacts($user->id);
+                            $response = new Response(
+                                json_encode(
+                                    $contacts
+                                ),
+                                200,
+                                ['Content-Type' => 'application/json']
+                            );
+                            $response->response();
+                        }
+                        break;
+                    default:
+                        $response = new Response(
+                            '',
+                            404
+                        );
+                        $response->response();
+                }
+                break;
+            case '/api/contact_add':
+                switch ($method) {
+                    case 'POST':case 'OPTIONS':
+                        $user = is_loggedin();
+                        if ( !$user ) break;
+                        $data = json_decode(
+                            file_get_contents("php://input")
+                        );
+
+                        if ( !$data->contact_id ) {
+                            $response = new Response(
+                                json_encode(
+                                    array(
+                                        "error" => "Credentials of contact is not provided",
+                                    )
+                                ),
+                                200,
+                                array(
+                                    "Content-Type" => "application/json"
+                                )
+                            );
+                            $response->response();
+                            break;
+                        }
+
+                        $user = new User($user->name, $user->pwd);
+                        $user->add_contacts($data->contact_id);
+                        $response = new Response(
+                            json_encode(
+                                array(
+                                    "ok" => "Contact added!"
+                                )
+                            ),
+                            200,
+                            array(
+                                "Content-Type" => 'application/json'
+                            )
+                        );
+                        $response->response();
+                        break;
                 }
                 break;
             default:
